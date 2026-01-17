@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Appointment - NeuroCare Hospital</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f8f9fa;
+      color: #333;
+    }
+
+    header {
+      background: #0a3d62;
+      color: #fff;
+      padding: 15px 50px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    header h1 { margin: 0; font-size: 22px; }
+    nav a { color: #fff; margin: 0 12px; text-decoration: none; font-weight: bold; }
+    nav a:hover { color: #1dd1a1; }
+
+    .main-content {
+      display: flex;
+      gap: 20px;
+      max-width: 1200px;
+      margin: 40px auto;
+    }
+    
+    .container {
+      flex: 1;
+      background: #fff;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    }
+    
+    .side-section {
+      width: 350px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+      max-height: 80vh;
+      overflow-y: auto;
+      display: none;
+    }
+    
+    .side-section.show {
+      display: block;
+    }
+    
+    .toggle-btn {
+      background: #0a3d62;
+      color: #fff;
+      border: none;
+      border-radius: 25px;
+      padding: 10px 20px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 20px;
+      transition: background 0.3s;
+    }
+    
+    .toggle-btn:hover {
+      background: #1dd1a1;
+    }
+    
+    .toggle-btn.active {
+      background: #1dd1a1;
+    }
+    
+    .side-section h3 {
+      color: #0a3d62;
+      margin-top: 0;
+      border-bottom: 2px solid #1dd1a1;
+      padding-bottom: 10px;
+    }
+    
+    .patient-info {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    
+    .patient-info h4 {
+      color: #0a3d62;
+      margin: 0 0 10px 0;
+    }
+    
+    .info-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    
+    .info-label {
+      font-weight: bold;
+      color: #666;
+    }
+    
+    .info-value {
+      color: #333;
+    }
+    
+    .appointments-list, .scans-list {
+      margin-bottom: 20px;
+    }
+    
+    .appointment-item, .scan-item {
+      background: #f1f1f1;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      border-left: 4px solid #1dd1a1;
+    }
+    
+    .appointment-item h5, .scan-item h5 {
+      margin: 0 0 8px 0;
+      color: #0a3d62;
+    }
+    
+    .appointment-details, .scan-details {
+      font-size: 12px;
+      color: #666;
+    }
+    
+    .no-data {
+      text-align: center;
+      color: #999;
+      font-style: italic;
+      padding: 20px;
+    }
+    
+    @media (max-width: 768px) {
+      .main-content {
+        flex-direction: column;
+      }
+      .side-section {
+        width: 100%;
+        max-height: none;
+      }
+    }
+    h2 { text-align: center; margin-top: 0; color: #0a3d62; }
+
+    form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .full { grid-column: 1 / -1; }
+    label { display: block; font-weight: bold; margin-bottom: 6px; }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #fafafa;
+    }
+    textarea { resize: vertical; min-height: 90px; }
+
+    .actions { grid-column: 1 / -1; display: flex; gap: 12px; justify-content: center; margin-top: 8px; }
+    button, a.button-link {
+      background: #1dd1a1;
+      color: #fff;
+      border: none;
+      border-radius: 25px;
+      padding: 12px 22px;
+      font-weight: bold;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+    }
+    button:hover, a.button-link:hover { background: #10ac84; }
+
+    .message { margin-top: 14px; text-align: center; font-weight: bold; }
+    .success { color: #0f995c; }
+    .error { color: #c0392b; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>NeuroCare Hospital</h1>
+    <nav>
+      <a href="webpage1.html">Home</a>
+      <a href="#">About</a>
+      <a href="#">Services</a>
+      <a href="#">Contact</a>
+    </nav>
+  </header>
+
+  <div class="main-content">
+    <div class="container">
+      <h2>Book an Appointment</h2>
+      <button type="button" class="toggle-btn" id="togglePatientDetails">
+        Show Patient Details
+      </button>
+      <form id="appointmentForm">
+      <div>
+        <label for="patientName">Patient Name</label>
+        <input type="text" id="patientName" name="patientName" required>
+      </div>
+      <div>
+        <label for="age">Age</label>
+        <input type="number" id="age" name="age" min="0" max="120" required>
+      </div>
+      <div>
+        <label for="gender">Gender</label>
+        <select id="gender" name="gender" required>
+          <option value="">Select</option>
+          <option>Male</option>
+          <option>Female</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div>
+        <label for="phone">Phone</label>
+        <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" placeholder="10-digit number" required>
+      </div>
+      <div class="full">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required>
+      </div>
+      <div>
+        <label for="date">Preferred Date</label>
+        <input type="date" id="date" name="date" required>
+      </div>
+      <div>
+        <label for="time">Preferred Time</label>
+        <input type="time" id="time" name="time" required>
+      </div>
+      <div class="full">
+        <label for="department">Department</label>
+        <select id="department" name="department" required>
+          <option value="">Select a department</option>
+          <option>Neurosurgery</option>
+          <option>Neurology</option>
+          <option>Neuro-oncology</option>
+          <option>Neuroradiology</option>
+          <option>Pain Management</option>
+        </select>
+      </div>
+      <div class="full">
+        <label for="notes">Notes / Symptoms</label>
+        <textarea id="notes" name="notes" placeholder="Describe symptoms or special requests"></textarea>
+      </div>
+      <div class="actions">
+        <button type="submit">Submit</button>
+        <a class="button-link" href="webpage1.html">Cancel</a>
+      </div>
+      <div id="message" class="message"></div>
+      </form>
+    </div>
+
+    <!-- Side Section for Patient Details -->
+    <div class="side-section" id="sideSection">
+      <h3>Patient Details</h3>
+      <div id="patientInfo" class="patient-info">
+        <h4>Current Patient</h4>
+        <div class="no-data">Fill the form to see patient details</div>
+      </div>
+      
+      <div class="appointments-list">
+        <h3>Recent Appointments</h3>
+        <div id="appointmentsList">
+          <div class="no-data">No appointments found</div>
+        </div>
+      </div>
+      
+      <div class="scans-list">
+        <h3>Recent Scans</h3>
+        <div id="scansList">
+          <div class="no-data">No scans found</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('appointmentForm');
+    const messageEl = document.getElementById('message');
+    const patientInfoEl = document.getElementById('patientInfo');
+    const appointmentsListEl = document.getElementById('appointmentsList');
+    const scansListEl = document.getElementById('scansList');
+    const toggleBtn = document.getElementById('togglePatientDetails');
+    const sideSection = document.getElementById('sideSection');
+
+    // Function to update patient info display
+    function updatePatientInfo(patientData) {
+      patientInfoEl.innerHTML = `
+        <h4>Current Patient</h4>
+        <div class="info-item">
+          <span class="info-label">Name:</span>
+          <span class="info-value">${patientData.patientName}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Age:</span>
+          <span class="info-value">${patientData.age}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Gender:</span>
+          <span class="info-value">${patientData.gender}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Phone:</span>
+          <span class="info-value">${patientData.phone}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Email:</span>
+          <span class="info-value">${patientData.email}</span>
+        </div>
+      `;
+    }
+
+    // Function to display appointments
+    function displayAppointments(appointments) {
+      if (appointments.length === 0) {
+        appointmentsListEl.innerHTML = '<div class="no-data">No appointments found</div>';
+        return;
+      }
+      
+      appointmentsListEl.innerHTML = appointments.map(apt => `
+        <div class="appointment-item">
+          <h5>${apt.department}</h5>
+          <div class="appointment-details">
+            <div><strong>Date:</strong> ${apt.date}</div>
+            <div><strong>Time:</strong> ${apt.time}</div>
+            ${apt.notes ? `<div><strong>Notes:</strong> ${apt.notes}</div>` : ''}
+            <div><strong>Booked:</strong> ${new Date(apt.createdAt).toLocaleDateString()}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Function to display scans
+    function displayScans(scans) {
+      if (scans.length === 0) {
+        scansListEl.innerHTML = '<div class="no-data">No scans found</div>';
+        return;
+      }
+      
+      scansListEl.innerHTML = scans.map(scan => `
+        <div class="scan-item">
+          <h5>${scan.scanType}</h5>
+          <div class="scan-details">
+            <div><strong>Date:</strong> ${scan.date}</div>
+            <div><strong>Time:</strong> ${scan.time}</div>
+            ${scan.notes ? `<div><strong>Notes:</strong> ${scan.notes}</div>` : ''}
+            <div><strong>Booked:</strong> ${new Date(scan.createdAt).toLocaleDateString()}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Function to fetch patient data
+    async function fetchPatientData(patientName, phone) {
+      try {
+        // Fetch appointments
+        const appointmentsRes = await fetch('http://localhost:4000/api/appointments');
+        const appointments = await appointmentsRes.json();
+        const patientAppointments = appointments.filter(apt => 
+          apt.patientName.toLowerCase() === patientName.toLowerCase() && 
+          apt.phone === phone
+        );
+
+        // Fetch scans
+        const scansRes = await fetch('http://localhost:4000/api/scans');
+        const scans = await scansRes.json();
+        const patientScans = scans.filter(scan => 
+          scan.patientName.toLowerCase() === patientName.toLowerCase() && 
+          scan.phone === phone
+        );
+
+        displayAppointments(patientAppointments);
+        displayScans(patientScans);
+      } catch (err) {
+        console.error('Error fetching patient data:', err);
+      }
+    }
+
+    // Update patient info when form fields change
+    function updatePatientInfoFromForm() {
+      const patientData = {
+        patientName: form.patientName.value.trim(),
+        age: form.age.value,
+        gender: form.gender.value,
+        phone: form.phone.value.trim(),
+        email: form.email.value.trim()
+      };
+
+      if (patientData.patientName && patientData.phone) {
+        updatePatientInfo(patientData);
+        fetchPatientData(patientData.patientName, patientData.phone);
+      } else {
+        patientInfoEl.innerHTML = `
+          <h4>Current Patient</h4>
+          <div class="no-data">Fill the form to see patient details</div>
+        `;
+        appointmentsListEl.innerHTML = '<div class="no-data">No appointments found</div>';
+        scansListEl.innerHTML = '<div class="no-data">No scans found</div>';
+      }
+    }
+
+    // Toggle patient details visibility
+    toggleBtn.addEventListener('click', () => {
+      sideSection.classList.toggle('show');
+      if (sideSection.classList.contains('show')) {
+        toggleBtn.textContent = 'Hide Patient Details';
+        toggleBtn.classList.add('active');
+        // Update patient info when showing
+        updatePatientInfoFromForm();
+      } else {
+        toggleBtn.textContent = 'Show Patient Details';
+        toggleBtn.classList.remove('active');
+      }
+    });
+
+    // Add event listeners to form fields
+    ['patientName', 'age', 'gender', 'phone', 'email'].forEach(fieldName => {
+      form[fieldName].addEventListener('input', updatePatientInfoFromForm);
+      form[fieldName].addEventListener('change', updatePatientInfoFromForm);
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      messageEl.textContent = '';
+      messageEl.className = 'message';
+
+      const payload = {
+        patientName: form.patientName.value.trim(),
+        age: Number(form.age.value),
+        gender: form.gender.value,
+        phone: form.phone.value.trim(),
+        email: form.email.value.trim(),
+        date: form.date.value,
+        time: form.time.value,
+        department: form.department.value,
+        notes: form.notes.value.trim()
+      };
+
+      try {
+        const res = await fetch('http://localhost:4000/api/appointments', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          const msg = data && data.error ? data.error : 'Failed to save';
+          throw new Error(msg);
+        }
+        messageEl.textContent = 'Appointment booked successfully! Redirecting to patient details...';
+        messageEl.classList.add('success');
+        
+        // Show countdown and redirect after 4 seconds
+        let countdown = 4;
+        const countdownInterval = setInterval(() => {
+          messageEl.textContent = `Appointment booked successfully! Redirecting to patient details in ${countdown} seconds...`;
+          countdown--;
+          if (countdown < 0) {
+            clearInterval(countdownInterval);
+            // Redirect to patient details page
+            window.location.href = `patient-details.html?name=${encodeURIComponent(payload.patientName)}&phone=${encodeURIComponent(payload.phone)}`;
+          }
+        }, 1000);
+        
+        form.reset();
+      } catch (err) {
+        messageEl.textContent = `Error booking appointment: ${err.message}. Please try again.`;
+        messageEl.classList.add('error');
+      }
+    });
+  </script>
+</body>
+</html>
+
+
